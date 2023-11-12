@@ -2,8 +2,8 @@
 - ~~Play Music~~
 - ~~Stop Music~~
 - ~~Skip Music Tracks~~
-- Pause Music Tracks
-- Resume Music Tracks
+- ~~Pause Music Tracks~~
+- ~~Resume Music Tracks~~
 - Volume Potentiometer
 - Configure PIR Sensor
 - Wave Detector

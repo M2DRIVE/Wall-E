@@ -3,8 +3,12 @@
 
 const int playPin = 13;
 const int skipPin = 12;
+const int pausePin = 11;
+
 int playRead = 0;
 int skipRead = 0;
+int pauseRead = 0;
+
 int currentTrack = 1;
 boolean isPlaying = false;
 
@@ -17,6 +21,7 @@ void setup() {
   
   pinMode(playPin, INPUT);
   pinMode(skipPin, INPUT);
+  pinMode(pausePin, INPUT);
 
   Serial.println(F("Initializing DFPlayer ..."));
   
@@ -40,7 +45,12 @@ void setup() {
 void loop() {
   playRead = digitalRead(playPin);   
   skipRead = digitalRead(skipPin);
-  
+  pauseRead = digitalRead(pausePin);
+
+  // 512 Not Playing
+  // 513 Playing
+  // 514 Paused
+
   if (playRead == HIGH) {
     if (mp3module.readState() == 512) {
       Serial.println("Playing track " + String(currentTrack));
@@ -49,7 +59,7 @@ void loop() {
 
     else {
       Serial.println("Stopping track " + String(currentTrack));
-      mp3module.reset();
+      mp3module.stop();
     }
 
     delay(500);
@@ -57,9 +67,24 @@ void loop() {
   
   else if (skipRead == HIGH) {
     currentTrack = (currentTrack++ % 3) + 1;   
-    if(mp3module.readState() == 513);
+    if(mp3module.readState() == 513 || mp3module.readState() == 514)
       mp3module.play(currentTrack);
     Serial.println("Skipping to track " + String(currentTrack));   
     delay(500);
   }
+
+  else if (pauseRead == HIGH) {
+    if(mp3module.readState() == 512) 
+      mp3module.play(currentTrack);
+    
+    else if(mp3module.readState() == 513)
+      mp3module.pause();
+
+    else if(mp3module.readState() == 514)
+      mp3module.start();
+
+    delay(500);
+  }
+
+  Serial.println(String(mp3module.readState()));
 }
