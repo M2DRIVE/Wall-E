@@ -13,7 +13,8 @@
 <br></br>
 
 ## BUGS
-- Once song ends, `isPlaying` is still set to true
+- ~~Once song ends, `isPlaying` is still set to true~~
+  - Switched to `mp3module.readState()` to determine if song is playing
 <br></br>
 
 ## Module Documentation

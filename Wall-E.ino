@@ -30,7 +30,7 @@ void setup() {
   Serial.println("Succesfully connected to DFPlayer Mini");
   
   mp3module.setTimeOut(500); 
-  mp3module.volume(25);  
+  mp3module.volume(17);  
   mp3module.EQ(DFPLAYER_EQ_NORMAL); 
   mp3module.outputDevice(DFPLAYER_DEVICE_SD);
   
@@ -42,7 +42,7 @@ void loop() {
   skipRead = digitalRead(skipPin);
   
   if (playRead == HIGH) {
-    if (!isPlaying) {
+    if (mp3module.readState() == 512) {
       Serial.println("Playing track " + String(currentTrack));
       mp3module.play(currentTrack);
     }
@@ -52,14 +52,14 @@ void loop() {
       mp3module.reset();
     }
 
-    isPlaying = !isPlaying; 
     delay(500);
   } 
   
   else if (skipRead == HIGH) {
-    currentTrack = (currentTrack++ % 3) + 1;
-    if(isPlaying)
+    currentTrack = (currentTrack++ % 3) + 1;   
+    if(mp3module.readState() == 513);
       mp3module.play(currentTrack);
-    Serial.println("Skipping to track " + String(currentTrack));
+    Serial.println("Skipping to track " + String(currentTrack));   
+    delay(500);
   }
 }
