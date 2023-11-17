@@ -4,6 +4,7 @@
 const int playPin = 13;
 const int skipPin = 12;
 const int pausePin = 11;
+const int potentiometer = 5;
 
 int playRead = 0;
 int skipRead = 0;
@@ -35,7 +36,7 @@ void setup() {
   Serial.println("Succesfully connected to DFPlayer Mini");
   
   mp3module.setTimeOut(500); 
-  mp3module.volume(17);  
+  //mp3module.volume(17);  
   mp3module.EQ(DFPLAYER_EQ_NORMAL); 
   mp3module.outputDevice(DFPLAYER_DEVICE_SD);
   
@@ -43,6 +44,9 @@ void setup() {
 }
 
 void loop() {
+  int volume = map(analogRead(potentiometer), 5, 1010, 0, 30);
+  mp3module.volume(volume);
+
   playRead = digitalRead(playPin);   
   skipRead = digitalRead(skipPin);
   pauseRead = digitalRead(pausePin);
@@ -74,17 +78,25 @@ void loop() {
   }
 
   else if (pauseRead == HIGH) {
-    if(mp3module.readState() == 512) 
+    // Consider switching to a switch statement
+    if(mp3module.readState() == 512) {
       mp3module.play(currentTrack);
-    
-    else if(mp3module.readState() == 513)
-      mp3module.pause();
+      Serial.println("Playing track " + String(currentTrack));
+    }
 
-    else if(mp3module.readState() == 514)
+    else if(mp3module.readState() == 513) {
+      mp3module.pause();
+      Serial.println("Pausing track " + String(currentTrack));
+    }
+
+    else if(mp3module.readState() == 514) {
       mp3module.start();
+      Serial.println("Resuming track " + String(currentTrack));
+    }
 
     delay(500);
   }
-
+  
+  //Serial.println(String(volume));
   Serial.println(String(mp3module.readState()));
 }
