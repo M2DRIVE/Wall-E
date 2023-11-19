@@ -11,7 +11,6 @@ int skipRead = 0;
 int pauseRead = 0;
 
 int currentTrack = 1;
-boolean isPlaying = false;
 
 SoftwareSerial mySoftwareSerial(4, 5);
 DFRobotDFPlayerMini mp3module;
