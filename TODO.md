@@ -6,7 +6,7 @@
 - ~~Resume Music Tracks~~
 - ~~Volume Potentiometer~~
 - Configure PIR Sensor
-- Wave Detector
+- ~~Wave Detector~~
 - Eye Servo Movement
 - Arm Servo Movement
 - Give Wall-E a voice
