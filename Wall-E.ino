@@ -3,16 +3,17 @@
 #include <SharpDistSensor.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1331.h>
+#include <Servo.h>
 #include <SPI.h>
 
-#define cs 10
-#define rst 9
-#define dc 8
+#define cs 2
+#define rst 3
+#define dc 4
 
-const int playPin = 13;
-const int skipPin = 12;
-const int pausePin = 11;
-const int potentiometer = 5;
+const int playPin = 5;
+const int skipPin = 6;
+const int pausePin = 7;
+const int potentiometer = A1;
 
 int playRead = 0;
 int skipRead = 0;
@@ -21,10 +22,22 @@ int currentTrack = 1;
 
 const byte sensorPin = A0;
 
-// Change these pin numbers
-SoftwareSerial mySoftwareSerial(4, 5);
+const int LeftEyeServoPin = 8;
+const int RightEyeServoPin = 9;
+const int WristServoPin = 10;
+const int ArmServoPin = 11;
+
+// Servos
+Servo LeftEyeServo;
+Servo RightEyeServo;
+Servo WristServo;
+Servo ArmServo;
+
+// DFPlayer Mini
+SoftwareSerial mySoftwareSerial(12, 13);
 DFRobotDFPlayerMini mp3module;
 
+// Sharp IR Sensor
 const byte medianFilterWindowSize = 5;
 SharpDistSensor sensor(sensorPin, medianFilterWindowSize);
 
@@ -42,6 +55,7 @@ enum State
 
 State currentState = INIT;
 
+// OLED Screen
 Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, rst);
 
 const unsigned char epd_bitmap_New_Project[] PROGMEM = {
@@ -96,7 +110,7 @@ const unsigned char epd_bitmap_New_Project[] PROGMEM = {
 
 const unsigned int bitmapWidth = 96;
 const unsigned int bitmapHeight = 64;
-const unsigned int bitmapSize = bitmapWidth * bitmapHeight / 8; // Calculate bitmap size in bytes
+const unsigned int bitmapSize = bitmapWidth * bitmapHeight / 8; 
 
 void setup() {
   Serial.begin(9600);
@@ -118,7 +132,6 @@ void setup() {
   Serial.println("Succesfully connected to DFPlayer Mini");
 
   mp3module.setTimeOut(500);
-  // mp3module.volume(17);
   mp3module.EQ(DFPLAYER_EQ_NORMAL);
   mp3module.outputDevice(DFPLAYER_DEVICE_SD);
 
