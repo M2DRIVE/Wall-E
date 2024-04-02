@@ -15,11 +15,6 @@ const int skipPin = 6;
 const int pausePin = 7;
 const int potentiometer = A1;
 
-int playRead = 0;
-int skipRead = 0;
-int pauseRead = 0;
-int currentTrack = 1;
-
 const byte sensorPin = A0;
 
 const int LeftEyeServoPin = 8;
@@ -34,6 +29,11 @@ Servo WristServo;
 Servo ArmServo;
 
 // DFPlayer Mini
+int playRead = 0;
+int skipRead = 0;
+int pauseRead = 0;
+int currentTrack = 1;
+
 SoftwareSerial mySoftwareSerial(12, 13);
 DFRobotDFPlayerMini mp3module;
 
@@ -116,10 +116,15 @@ void setup() {
   Serial.begin(9600);
   mySoftwareSerial.begin(9600);
 
+  LeftEyeServo.write(90);
+  RightEyeServo.write(90);
+  WristServo.write(90);
+  ArmServo.write(90);
+
   pinMode(playPin, INPUT);
   pinMode(skipPin, INPUT);
   pinMode(pausePin, INPUT);
-
+ 
   Serial.println(F("Initializing DFPlayer ..."));
 
   if (!mp3module.begin(mySoftwareSerial)) {
@@ -137,29 +142,24 @@ void setup() {
 
   // Initialize OLED display with SPI
   display.begin();
-  display.setRotation(0);                                       // Adjust rotation if needed
+  display.setRotation(0);                                       
   display.fillRect(0, 0, display.width(), display.height(), 0); // Fill with black
 
   // Draw bitmap
-  for (unsigned int y = 0; y < bitmapHeight; y++)
-  {
-    for (unsigned int x = 0; x < bitmapWidth; x++)
-    {
+  for (unsigned int y = 0; y < bitmapHeight; y++) {
+    for (unsigned int x = 0; x < bitmapWidth; x++) {
       unsigned int index = y * (bitmapWidth / 8) + (x / 8);
       unsigned int bit = 7 - (x % 8);
       unsigned char pixel = pgm_read_byte(&epd_bitmap_New_Project[index]);
       if (!(pixel & (1 << bit)))
-      {
         display.drawPixel(x, y, 0XFFE0); // Draw yellow pixel
-      }
     }
   }
 
   delay(100);
 }
 
-void loop()
-{
+void loop() {
   int volume = map(analogRead(potentiometer), 5, 1010, 0, 30);
   mp3module.volume(volume);
 
