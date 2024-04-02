@@ -2,13 +2,15 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1331.h>
 
-#define sclk 13
-#define mosi 11
+// #define sclk 13
+// #define mosi 11
 #define cs   10
 #define rst  9
 #define dc   8
 
-Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, mosi, sclk, rst);
+// Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, mosi, sclk, rst);
+Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, rst);
+
 
 // 'New Project', 96x64px
 const unsigned char epd_bitmap_New_Project [] PROGMEM = {

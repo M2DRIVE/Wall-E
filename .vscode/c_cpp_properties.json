@@ -7,7 +7,8 @@
             "compilerArgs": [],
             "intelliSenseMode": "windows-msvc-x64",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "C:/Users/Jose Pedraza/AppData/Local/Arduino15/libraries/SPI/src"
             ],
             "forcedInclude": [],
             "cStandard": "c17",
@@ -35,7 +36,7 @@
             "includePath": [
                 "C:\\Users\\Jose Pedraza\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\cores\\arduino",
                 "C:\\Users\\Jose Pedraza\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\variants\\standard",
-                "C:\\Users\\Jose Pedraza\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\libraries\\SPI\\src",
+                "C:\\Users\\Jose Pedraza\\Documents\\Arduino\\libraries\\SPI\\src",
                 "C:\\Users\\Jose Pedraza\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library",
                 "C:\\Users\\Jose Pedraza\\Documents\\Arduino\\libraries\\Adafruit_BusIO",
                 "C:\\Users\\Jose Pedraza\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\libraries\\Wire\\src",

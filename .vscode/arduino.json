@@ -1,5 +1,6 @@
 {
     "board": "arduino:avr:uno",
     "programmer": "avrispmkii",
-    "sketch": "oled\\oled.ino"
+    "sketch": "oled\\oled.ino",
+    "port": "COM5"
 }
