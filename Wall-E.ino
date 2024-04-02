@@ -167,13 +167,58 @@ void loop() {
   skipRead = digitalRead(skipPin);
   pauseRead = digitalRead(pausePin);
 
-  // 512 Not Playing
-  // 513 Playing
-  // 514 Paused
+  const int isNotPlaying = 512;
+  const int isPlaying = 513;
+  const int isPaused = 514;
 
+  if(mp3module.readState() == isNotPlaying || mp3module.readState() == isPaused) {
+      unsigned int distance = sensor.getDist();
+      switch (currentState) {
+      case INIT:
+        if (distance < threshold) {
+          currentState = FIRST_DROP;
+        }
+        break;
+  
+      case FIRST_DROP:
+        if (distance > threshold) {
+          currentState = FIRST_PEAK;
+        }
+        break;
+  
+      case FIRST_PEAK:
+        if (distance < threshold) {
+          currentState = SECOND_DROP;
+        }
+        break;
+  
+      case SECOND_DROP:
+        if (distance > threshold) {
+          currentState = SECOND_PEAK;
+        }
+        break;
+  
+      case SECOND_PEAK:
+        if (distance < threshold) {
+          // Pattern detected
+          
+          
+          currentState = INIT;
+        }
+        break;
+      }
+
+      if (sampleCounter == 30) {
+          currentState = INIT;
+          sampleCounter = 0;
+      } 
+      else 
+        sampleCounter++;
+  }
+  
   if (playRead == HIGH)
   {
-    if (mp3module.readState() == 512)
+    if (mp3module.readState() == isNotPlaying)
     {
       Serial.println("Playing track " + String(currentTrack));
       mp3module.play(currentTrack);
@@ -191,7 +236,7 @@ void loop() {
   else if (skipRead == HIGH)
   {
     currentTrack = (currentTrack++ % 3) + 1;
-    if (mp3module.readState() == 513 || mp3module.readState() == 514)
+    if (mp3module.readState() == isPlaying || mp3module.readState() == isPaused)
       mp3module.play(currentTrack);
     Serial.println("Skipping to track " + String(currentTrack));
     delay(500);
@@ -200,19 +245,19 @@ void loop() {
   else if (pauseRead == HIGH)
   {
     // Consider switching to a switch statement
-    if (mp3module.readState() == 512)
+    if (mp3module.readState() == isNotPlaying)
     {
       mp3module.play(currentTrack);
       Serial.println("Playing track " + String(currentTrack));
     }
 
-    else if (mp3module.readState() == 513)
+    else if (mp3module.readState() == isPlaying)
     {
       mp3module.pause();
       Serial.println("Pausing track " + String(currentTrack));
     }
 
-    else if (mp3module.readState() == 514)
+    else if (mp3module.readState() == isPaused)
     {
       mp3module.start();
       Serial.println("Resuming track " + String(currentTrack));
