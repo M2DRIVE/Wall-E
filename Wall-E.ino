@@ -123,9 +123,9 @@ void setup() {
   WristServo.write(90);
   ArmServo.write(90);
 
-  pinMode(playPin, INPUT);
-  pinMode(skipPin, INPUT);
-  pinMode(pausePin, INPUT);
+  pinMode(playPin, INPUT_PULLUP);
+  pinMode(skipPin, INPUT_PULLUP);
+  pinMode(pausePin, INPUT_PULLUP);
  
   Serial.println(F("Initializing DFPlayer ..."));
 
@@ -270,17 +270,17 @@ void loop() {
 }
 
 void waveArm(int volume) {
-  ArmServo.write();
+  ArmServo.write(90+45);
   delay(750);
-  WristServo.write();
+  WristServo.write(90+50);
   delay(200);
-  WristServo.write();
+  WristServo.write(90);
   delay(200);
-  WristServo.write();
+  WristServo.write(90+50);
   delay(200);
-  WristServo.write();
+  WristServo.write(90);
   delay(200);
-  ArmServo.write();
+  ArmServo.write(90);
   delay(1000);
 
   voiceLines.volume(volume);
@@ -291,7 +291,7 @@ void waveArm(int volume) {
 
   else {
     int randomVoiceLine = random(2, 19);
-    voiceLine.playFolder(2, randomVoiceLine);
+    voiceLines.playFolder(2, randomVoiceLine);
   }
 
   delay(1500);
