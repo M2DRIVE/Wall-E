@@ -36,7 +36,8 @@ int currentTrack = 1;
 
 SoftwareSerial mySoftwareSerial(12, 13);
 DFRobotDFPlayerMini mp3module;
-DFRobotDFPlayerMini voiceLines;
+
+const int numOfSongs = 3;
 
 // Sharp IR Sensor
 const byte medianFilterWindowSize = 5;
@@ -142,10 +143,6 @@ void setup() {
   mp3module.EQ(DFPLAYER_EQ_NORMAL);
   mp3module.outputDevice(DFPLAYER_DEVICE_SD);
 
-  voiceLines.setTimeOut(500);
-  voiceLines.EQ(DFPLAYER_EQ_NORMAL);
-  voiceLines.outputDevice(DFPLAYER_DEVICE_SD);
-
   // Initialize OLED display with SPI
   display.begin();
   display.setRotation(0);                                       
@@ -204,7 +201,7 @@ void loop() {
       case SECOND_PEAK:
         if (distance < threshold) {
           // Pattern detected
-          waveArm(volume);
+          waveArm();
           currentState = INIT;
         }
         break;
@@ -223,7 +220,7 @@ void loop() {
   if (playRead == HIGH) {
     if (mp3module.readState() == notPlaying) {
       Serial.println("Playing track " + String(currentTrack));
-      mp3module.play(currentTrack);
+      mp3module.playFolder(1, currentTrack);
     }
 
     else {
@@ -235,9 +232,9 @@ void loop() {
   }
 
   else if (skipRead == HIGH) {
-    currentTrack = (currentTrack++ % 3) + 1;
+    currentTrack = (currentTrack++ % numOfSongs) + 1;
     if (mp3module.readState() == playing || mp3module.readState() == paused)
-      mp3module.play(currentTrack);
+      mp3module.playFolder(1, currentTrack);
     Serial.println("Skipping to track " + String(currentTrack));
     delay(500);
   }
@@ -246,7 +243,7 @@ void loop() {
     // Consider switching to a switch statement
     if (mp3module.readState() == notPlaying)
     {
-      mp3module.play(currentTrack);
+      mp3module.playFolder(1, currentTrack);
       Serial.println("Playing track " + String(currentTrack));
     }
 
@@ -269,7 +266,9 @@ void loop() {
   Serial.println(String(mp3module.readState()));
 }
 
-void waveArm(int volume) {
+void waveArm() {
+  mp3module.stop();
+	
   ArmServo.write(90+45);
   delay(750);
   WristServo.write(90+50);
@@ -283,15 +282,13 @@ void waveArm(int volume) {
   ArmServo.write(90);
   delay(1000);
 
-  voiceLines.volume(volume);
-
   int sayWallEChance = random(1 , 100);
   if(sayWallEChance <= 20) 
-    voiceLines.playFolder(2, 1);
+    mp3module.playFolder(2, 1);
 
   else {
     int randomVoiceLine = random(2, 19);
-    voiceLines.playFolder(2, randomVoiceLine);
+    mp3module.playFolder(2, randomVoiceLine);
   }
 
   delay(1500);
