@@ -12,7 +12,7 @@
 
 const int playPin = 5;
 const int skipPin = 6;
-const int pausePin = 7;
+const int stopPin = 7;
 const int potentiometer = A1;
 
 const byte sensorPin = A0;
@@ -31,7 +31,7 @@ Servo ArmServo;
 // DFPlayer Mini
 int playRead = 0;
 int skipRead = 0;
-int pauseRead = 0;
+int stopRead = 0;
 int currentTrack = 1;
 
 SoftwareSerial mySoftwareSerial(12, 13);
@@ -126,7 +126,7 @@ void setup() {
 
   pinMode(playPin, INPUT_PULLUP);
   pinMode(skipPin, INPUT_PULLUP);
-  pinMode(pausePin, INPUT_PULLUP);
+  pinMode(stopPin, INPUT_PULLUP);
  
   Serial.println(F("Initializing DFPlayer ..."));
 
@@ -168,7 +168,7 @@ void loop() {
 
   playRead = digitalRead(playPin);
   skipRead = digitalRead(skipPin);
-  pauseRead = digitalRead(pausePin);
+  stopRead = digitalRead(stopPin);
 
   const int notPlaying = 512;
   const int playing = 513;
@@ -217,15 +217,30 @@ void loop() {
   }
 
   // Music Player
-  if (playRead == HIGH) {
+  if (stopRead == HIGH) {
+    Serial.println("Stopping track " + String(currentTrack));
+    mp3module.stop();
+    delay(500);
+  }
+
+  else if (playRead == HIGH) {
     if (mp3module.readState() == notPlaying) {
       Serial.println("Playing track " + String(currentTrack));
       mp3module.playFolder(1, currentTrack);
-    }
-
+    } 
+    // Pause Conditions
     else {
-      Serial.println("Stopping track " + String(currentTrack));
-      mp3module.stop();
+      if (mp3module.readState() == playing)
+      {
+        mp3module.pause();
+        Serial.println("Pausing track " + String(currentTrack));
+      }
+
+      else if (mp3module.readState() == paused)
+      {
+        mp3module.start();
+        Serial.println("Resuming track " + String(currentTrack));
+      }
     }
 
     delay(500);
@@ -236,29 +251,6 @@ void loop() {
     if (mp3module.readState() == playing || mp3module.readState() == paused)
       mp3module.playFolder(1, currentTrack);
     Serial.println("Skipping to track " + String(currentTrack));
-    delay(500);
-  }
-
-  else if (pauseRead == HIGH) {
-    // Consider switching to a switch statement
-    if (mp3module.readState() == notPlaying)
-    {
-      mp3module.playFolder(1, currentTrack);
-      Serial.println("Playing track " + String(currentTrack));
-    }
-
-    else if (mp3module.readState() == playing)
-    {
-      mp3module.pause();
-      Serial.println("Pausing track " + String(currentTrack));
-    }
-
-    else if (mp3module.readState() == paused)
-    {
-      mp3module.start();
-      Serial.println("Resuming track " + String(currentTrack));
-    }
-
     delay(500);
   }
 
