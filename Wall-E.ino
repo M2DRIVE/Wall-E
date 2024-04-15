@@ -229,8 +229,7 @@ void loop() {
   else if (playRead == LOW) {
     if (mp3module.readState() == notPlaying) {
       Serial.println("Playing track " + String(currentTrack));
-      // mp3module.playFolder(1, currentTrack);
-      mp3module.play(currentTrack);
+      mp3module.playFolder(1, currentTrack);
     } 
     // Pause Conditions
     else {
@@ -253,15 +252,15 @@ void loop() {
   else if (skipRead == LOW) {
     currentTrack = (currentTrack++ % numOfSongs) + 1;
     if (mp3module.readState() == playing || mp3module.readState() == paused)
-      mp3module.play(currentTrack);
+      mp3module.playFolder(1, currentTrack);
     Serial.println("Skipping to track " + String(currentTrack));
     delay(500);
   }
 
-  // Serial.println(String(volume));
-  Serial.println(String(mp3module.readState()));
-  Serial.println("Button State : " + String(stopRead));
+  //Serial.println(String(mp3module.readState()));
+  //Serial.println("Button State : " + String(stopRead));
   Serial.println("Volume : " + String(volume));
+  Serial.println("Current Track  : " +String(currentTrack));
 }
 
 // void waveArm() {
