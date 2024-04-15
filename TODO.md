@@ -24,3 +24,7 @@
 
 ## Module Documentation
 DFPlayer Mini : https://wiki.dfrobot.com/DFPlayer_Mini_SKU_DFR0299#Connection_Diagram
+https://github.com/ahmetdidarzafer/Components/tree/main/MP3%20Module
+
+OLED : https://github.com/BasOnTech/Arduino-Beginners-EN/tree/master/E25-OLED-SPI-SSD1331-96x64-color
+
