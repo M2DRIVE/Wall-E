@@ -15,7 +15,10 @@
 ## BUGS
 - ~~Once song ends, `isPlaying` is still set to true~~
   - Switched to `mp3module.readState()` to determine if song is playing
-- Potentiometer might slowly decrease over time
+- ~~Potentiometer might slowly decrease over time~~
+  - I'm gonna ignore that probably won't happen
+- OLed screen takes a while to load
+- Button Debounce 
 
 <br></br>
 
