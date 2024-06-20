@@ -19,13 +19,13 @@ const int potentiometer = A1;
 
 // const byte sensorPin = A0;
 
-// const int LeftEyeServoPin = 8;
-// const int RightEyeServoPin = 9;
-// const int WristServoPin = 10;
-// const int ArmServoPin = 11;
+const int LeftEyeServoPin = 9;
+// const int RightEyeServoPin = 10;
+// const int WristServoPin = 11;
+// const int ArmServoPin = 8;
 
-// // Servos
-// Servo LeftEyeServo;
+// Servos
+Servo LeftEyeServo;
 // Servo RightEyeServo;
 // Servo WristServo;
 // Servo ArmServo;
@@ -41,23 +41,23 @@ DFRobotDFPlayerMini mp3module;
 
 const int numOfSongs = 10;
 
-// // Sharp IR Sensor
+// Sharp IR Sensor
 // const byte medianFilterWindowSize = 5;
 // SharpDistSensor sensor(sensorPin, medianFilterWindowSize);
 
 // int sampleCounter = 0;
 // const int threshold = 390;
 
-// enum State
-// {
-//   INIT,
-//   FIRST_DROP,
-//   FIRST_PEAK,
-//   SECOND_DROP,
-//   SECOND_PEAK
-// };
+enum State
+{
+  INIT,
+  FIRST_DROP,
+  FIRST_PEAK,
+  SECOND_DROP,
+  SECOND_PEAK
+};
 
-// State currentState = INIT;
+State currentState = INIT;
 
 // OLED Screen
 Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, mosi, sclk, rst);
@@ -121,7 +121,12 @@ void setup() {
   Serial.begin(9600);
   mySoftwareSerial.begin(9600);
 
-  // LeftEyeServo.write(90);
+  LeftEyeServo.attach(LeftEyeServoPin);
+  // RightEyeServo.attach(RightEyeServoPin);
+  // WristServo.attach(WristServoPin);
+  // ArmServo.attach(ArmServoPin);
+  delay(15);
+  LeftEyeServo.write(90);
   // RightEyeServo.write(90);
   // WristServo.write(90);
   // ArmServo.write(90);
@@ -176,47 +181,47 @@ void loop() {
   const int playing = 513;
   const int paused = 514;
 
-//   // Wave Detector
-//   if(mp3module.readState() == notPlaying || mp3module.readState() == paused) {
-//     unsigned int distance = sensor.getDist();
-//     switch (currentState) {
-//       case INIT:
-//         if (distance < threshold) 
-//           currentState = FIRST_DROP;
-//         break;
+  // Wave Detector
+  // if(mp3module.readState() == notPlaying || mp3module.readState() == paused) {
+  //   unsigned int distance = sensor.getDist();
+  //   switch (currentState) {
+  //     case INIT:
+  //       if (distance < threshold) 
+  //         currentState = FIRST_DROP;
+  //       break;
   
-//       case FIRST_DROP:
-//         if (distance > threshold) 
-//           currentState = FIRST_PEAK;
-//         break;
+  //     case FIRST_DROP:
+  //       if (distance > threshold) 
+  //         currentState = FIRST_PEAK;
+  //       break;
   
-//       case FIRST_PEAK:
-//         if (distance < threshold) 
-//           currentState = SECOND_DROP;
-//         break;
+  //     case FIRST_PEAK:
+  //       if (distance < threshold) 
+  //         currentState = SECOND_DROP;
+  //       break;
   
-//       case SECOND_DROP:
-//         if (distance > threshold) 
-//           currentState = SECOND_PEAK;
-//         break;
+  //     case SECOND_DROP:
+  //       if (distance > threshold) 
+  //         currentState = SECOND_PEAK;
+  //       break;
   
-//       case SECOND_PEAK:
-//         if (distance < threshold) {
-//           // Pattern detected
-//           waveArm();
-//           currentState = INIT;
-//         }
-//         break;
-//       }
+  //     case SECOND_PEAK:
+  //       if (distance < threshold) {
+  //         // Pattern detected
+  //         waveArm();
+  //         currentState = INIT;
+  //       }
+  //       break;
+  //     }
 
-//       if (sampleCounter == 30) {
-//         currentState = INIT;
-//         sampleCounter = 0;
-//       } 
+  //     if (sampleCounter == 30) {
+  //       currentState = INIT;
+  //       sampleCounter = 0;
+  //     } 
 
-//       else 
-//         sampleCounter++;
-//   }
+  //     else 
+  //       sampleCounter++;
+  // }
 
   // Music Player
   if (stopRead == LOW) {
