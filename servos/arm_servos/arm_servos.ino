@@ -1,12 +1,8 @@
 #include <Servo.h>
 
-Servo LeftEyeServo;
-Servo RightEyeServo;
 Servo WristServo;
 Servo ArmServo;
 
-const int LeftEyeServoPin = 0;
-const int RightEyeServoPin = 0;
 const int WristServoPin = 10;
 const int ArmServoPin = 9;
 

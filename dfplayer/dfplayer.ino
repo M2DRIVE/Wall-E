@@ -46,7 +46,7 @@ void setup(){
 }
 
 void loop(){
-  int volume = map(analogRead(potentiometer), 330, 1010, 0, 30);
+  int volume = map(analogRead(potentiometer), 5, 1010, 0, 30);
   volume = constrain(volume, 0, 30);
   mp3module.volume(volume);
 
@@ -96,5 +96,5 @@ void loop(){
     delay(500);
   }
 
-  Serial.println("Current Track : " +String(currentTrack) + "  |  State : " + String(mp3module.readState()) + "  |  Volume : " + String(volume));
+  Serial.println("Current Track : " +String(currentTrack) + "  |  State : " + String(mp3module.readState()) + "  |  State : " + String(analogRead(potentiometer)));
 }

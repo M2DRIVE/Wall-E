@@ -1,7 +1,6 @@
 {
-    "board": "arduino:avr:nano",
+    "board": "arduino:avr:uno",
     "programmer": "avrispmkii",
-    "sketch": "servo\\servo.ino",
-    "port": "COM8",
-    "configuration": "cpu=atmega328old"
+    "sketch": "servos\\eye_servos\\eye_servos.ino",
+    "port": "COM5"
 }
