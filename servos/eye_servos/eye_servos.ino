@@ -4,7 +4,7 @@ Servo LeftEye;
 Servo RightEye;
 
 const int LeftEyeServoPin = 9;
-const int RightEyeServoPin = 10;
+const int RightEyeServoPin = 6;
 
 void setup() {
     Serial.begin(9600);

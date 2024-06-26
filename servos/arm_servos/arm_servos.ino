@@ -3,8 +3,8 @@
 Servo WristServo;
 Servo ArmServo;
 
-const int WristServoPin = 10;
-const int ArmServoPin = 9;
+const int WristServoPin = 11;
+const int ArmServoPin = 10;
 
 void setup() {
   Serial.begin(9600);
