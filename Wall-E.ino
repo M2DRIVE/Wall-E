@@ -1,55 +1,55 @@
-#include "SoftwareSerial.h"
-#include "DFRobotDFPlayerMini.h"
+#include <SoftwareSerial.h>
+#include <DFPlayerMini_Fast.h>
 #include <SharpDistSensor.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1331.h>
 #include <Servo.h>
 #include <SPI.h>
 
-#define cs 2
-#define dc 3
-#define rst 4
-#define mosi A4
-#define sclk A5
-
-const int stopPin = 5;
-const int playPin = 6;
-const int skipPin = 7;
+const int stopPin = 2;
+const int playPin = 3;
+const int skipPin = 4;
 const int potentiometer = A1;
 
-// const byte sensorPin = A0;
+const byte sensorPin = A0;
 
-const int LeftEyeServoPin = 9;
-// const int RightEyeServoPin = 10;
-// const int WristServoPin = 11;
-// const int ArmServoPin = 8;
+#define cs 5
+#define dc 7
+#define rst 8
+#define mosi A5
+#define sclk A4
+
+const int RightEyePin = 6;
+const int LeftEyePin = 9;
+
+const int ArmServoPin = 10;
+const int WristServoPin = 11;
 
 // Servos
-Servo LeftEyeServo;
-// Servo RightEyeServo;
-// Servo WristServo;
-// Servo ArmServo;
+Servo RightEye;
+Servo LeftEye;
+
+Servo ArmServo;
+Servo WristServo;
 
 // DFPlayer Mini
 int playRead = 0;
 int skipRead = 0;
 int stopRead = 0;
 int currentTrack = 1;
+int numOfSongs;
 
 SoftwareSerial mySoftwareSerial(12, 13);
-DFRobotDFPlayerMini mp3module;
+DFPlayerMini_Fast mp3module;
 
-const int numOfSongs = 10;
+// Sharp IR
+const byte medianFilterWindowSize = 5;
+SharpDistSensor sensor(sensorPin, medianFilterWindowSize);
 
-// Sharp IR Sensor
-// const byte medianFilterWindowSize = 5;
-// SharpDistSensor sensor(sensorPin, medianFilterWindowSize);
+int sampleCounter = 0;
+const int threshold = 400;
 
-// int sampleCounter = 0;
-// const int threshold = 390;
-
-enum State
-{
+enum State {
   INIT,
   FIRST_DROP,
   FIRST_PEAK,
@@ -59,7 +59,7 @@ enum State
 
 State currentState = INIT;
 
-// OLED Screen
+// OLED
 Adafruit_SSD1331 display = Adafruit_SSD1331(cs, dc, mosi, sclk, rst);
 
 const unsigned char epd_bitmap_New_Project [] PROGMEM = {
@@ -118,41 +118,9 @@ const unsigned int bitmapHeight = 64;
 const unsigned int bitmapSize = bitmapWidth * bitmapHeight / 8; 
 
 void setup() {
-  Serial.begin(9600);
-  mySoftwareSerial.begin(9600);
-
-  LeftEyeServo.attach(LeftEyeServoPin);
-  // RightEyeServo.attach(RightEyeServoPin);
-  // WristServo.attach(WristServoPin);
-  // ArmServo.attach(ArmServoPin);
-  delay(15);
-  LeftEyeServo.write(90);
-  // RightEyeServo.write(90);
-  // WristServo.write(90);
-  // ArmServo.write(90);
-
-  pinMode(playPin, INPUT_PULLUP);
-  pinMode(skipPin, INPUT_PULLUP);
-  pinMode(stopPin, INPUT_PULLUP);
- 
-  Serial.println(F("Initializing DFPlayer ..."));
-
-  if (!mp3module.begin(mySoftwareSerial)) {
-    Serial.println("Unable to connect to module!");
-    Serial.println("Check cable connections and");
-    Serial.println("make sure SD Card is inserted");
-    while (1);
-  }
-
-  Serial.println("Succesfully connected to DFPlayer Mini");
-
-  mp3module.setTimeOut(500);
-  mp3module.EQ(DFPLAYER_EQ_NORMAL);
-  mp3module.outputDevice(DFPLAYER_DEVICE_SD);
-
   // Initialize OLED display with SPI
   display.begin();
-  display.setRotation(0);                                       
+  display.setRotation(0); 
   display.fillRect(0, 0, display.width(), display.height(), 0); // Fill with black
 
   // Draw bitmap
@@ -161,91 +129,99 @@ void setup() {
       unsigned int index = y * (bitmapWidth / 8) + (x / 8);
       unsigned int bit = 7 - (x % 8);
       unsigned char pixel = pgm_read_byte(&epd_bitmap_New_Project[index]);
-      if (pixel & (1 << bit))
+      if ((pixel & (1 << bit))) {
         display.drawPixel(x, y, 0XFFE0); // Draw yellow pixel
+      }
     }
   }
 
+  // Arm Servos
+  ArmServo.attach(ArmServoPin);
+  WristServo.attach(WristServoPin);
   delay(100);
+  ArmServo.write(90);
+  WristServo.write(150);
+  delay(500);
+  ArmServo.detach();
+  WristServo.detach();
+
+  // Eye Servos
+  LeftEye.attach(LeftEyePin);
+  RightEye.attach(RightEyePin);  
+  delay(100);
+  LeftEye.write(90+11.5);
+  RightEye.write(85-11.5);
+
+  delay(500);
+  moveEyes();
+  delay(500);
+  
+  LeftEye.detach();
+  RightEye.detach();
+
+  // DFPlayer Mini
+  Serial.begin(9600);
+  mySoftwareSerial.begin(9600);
+  mp3module.begin(mySoftwareSerial);
+
+  pinMode(playPin, INPUT_PULLUP);
+  pinMode(skipPin, INPUT_PULLUP);
+  pinMode(stopPin, INPUT_PULLUP);
+
+  Serial.println(F("Initializing DFPlayer ... (May take 3~5 seconds)"));
+  
+  if (!mp3module.begin(mySoftwareSerial, false)) { 
+    Serial.println("Unable to connect to module!");
+    Serial.println("Check cable connections and");
+    Serial.println("make sure SD Card is inserted");
+    while(1);
+  }
+  
+  Serial.println("Successfully connected to DFPlayer Mini");
+
+  delay(100);
+  numOfSongs = mp3module.numTracksInFolder(1);
+  mp3module.sleep();
+  delay(1000);
 }
 
 void loop() {
+
+  // DFPlayer Mini
   int volume = map(analogRead(potentiometer), 5, 1010, 0, 30);
+  volume = constrain(volume, 0, 30);
   mp3module.volume(volume);
 
   playRead = digitalRead(playPin);
   skipRead = digitalRead(skipPin);
   stopRead = digitalRead(stopPin);
 
-  const int notPlaying = 512;
-  const int playing = 513;
-  const int paused = 514;
-
-  // Wave Detector
-  // if(mp3module.readState() == notPlaying || mp3module.readState() == paused) {
-  //   unsigned int distance = sensor.getDist();
-  //   switch (currentState) {
-  //     case INIT:
-  //       if (distance < threshold) 
-  //         currentState = FIRST_DROP;
-  //       break;
-  
-  //     case FIRST_DROP:
-  //       if (distance > threshold) 
-  //         currentState = FIRST_PEAK;
-  //       break;
-  
-  //     case FIRST_PEAK:
-  //       if (distance < threshold) 
-  //         currentState = SECOND_DROP;
-  //       break;
-  
-  //     case SECOND_DROP:
-  //       if (distance > threshold) 
-  //         currentState = SECOND_PEAK;
-  //       break;
-  
-  //     case SECOND_PEAK:
-  //       if (distance < threshold) {
-  //         // Pattern detected
-  //         waveArm();
-  //         currentState = INIT;
-  //       }
-  //       break;
-  //     }
-
-  //     if (sampleCounter == 30) {
-  //       currentState = INIT;
-  //       sampleCounter = 0;
-  //     } 
-
-  //     else 
-  //       sampleCounter++;
-  // }
-
-  // Music Player
   if (stopRead == LOW) {
     Serial.println("Stopping track " + String(currentTrack));
     mp3module.stop();
+    delay(100);
+    mp3module.sleep();
     delay(500);
   }
 
   else if (playRead == LOW) {
-    if (mp3module.readState() == notPlaying) {
+    if (!mp3module.isPlaying()) {
       Serial.println("Playing track " + String(currentTrack));
+      mp3module.wakeUp();
       mp3module.playFolder(1, currentTrack);
     } 
+    
     // Pause Conditions
     else {
-      if (mp3module.readState() == playing)
+      if (mp3module.isPlaying())
       {
         mp3module.pause();
         Serial.println("Pausing track " + String(currentTrack));
       }
 
-      else if (mp3module.readState() == paused)
+      else 
       {
-        mp3module.start();
+        mp3module.resume();
         Serial.println("Resuming track " + String(currentTrack));
       }
     }
@@ -255,57 +231,178 @@ void loop() {
 
   else if (skipRead == LOW) {
     currentTrack = (currentTrack++ % numOfSongs) + 1;
-    if (mp3module.readState() == playing || mp3module.readState() == paused)
+    if (mp3module.isPlaying()) {
       mp3module.playFolder(1, currentTrack);
+    }
     Serial.println("Skipping to track " + String(currentTrack));
     delay(500);
   }
 
-  //Serial.println(String(mp3module.readState()));
-  //Serial.println("Button State : " + String(stopRead));
-  Serial.println("Volume : " + String(volume));
-  Serial.println("Current Track  : " +String(currentTrack));
+  Serial.println("Current Track : " +String(currentTrack) + "  |  State : " + String(mp3module.isPlaying()));
+
+  // Sharp IR Sensor
+  if(!mp3module.isPlaying()) {
+    unsigned int distance = sensor.getDist();
+
+    switch (currentState) {
+      case INIT:
+        if (distance < threshold) {
+          currentState = FIRST_DROP;
+        }
+        break;
+
+      case FIRST_DROP:
+        if (distance > threshold) {
+          currentState = FIRST_PEAK;
+        }
+        break;
+
+      case FIRST_PEAK:
+        if (distance < threshold) {
+          currentState = SECOND_DROP;
+        }
+        break;
+
+      case SECOND_DROP:
+        if (distance > threshold) {
+          currentState = SECOND_PEAK;
+        }
+        break;
+
+      case SECOND_PEAK:
+        // Wave Detected
+        if (distance < threshold) {
+          wave();
+          delay(500); 
+          playRandomVoiceLine();
+          delay(500);
+          moveEyes();
+          currentState = INIT;
+        }
+        break;
+    }
+
+    if (sampleCounter == 30) {
+      currentState = INIT;
+      sampleCounter = 0;
+    } else {
+      sampleCounter++;
+    }
+    // Serial.print(500);
+    // Serial.print(", ");
+    // Serial.print(0);
+    // Serial.print(", ");
+    // Serial.println(distance);
+  }
+  
+  delay(20);
 }
 
-// void waveArm() {
-//   mp3module.stop();
-	
-//   ArmServo.write(90+45);
-//   delay(750);
-//   WristServo.write(90+50);
-//   delay(200);
-//   WristServo.write(90);
-//   delay(200);
-//   WristServo.write(90+50);
-//   delay(200);
-//   WristServo.write(90);
-//   delay(200);
-//   ArmServo.write(90);
-//   delay(1000);
+void moveEyes() { 
+    Serial.println("Eyes Moved Up");
+    LeftEye.attach(LeftEyePin);
+    RightEye.attach(RightEyePin);
+    LeftEye.write(90+51);
+    RightEye.write(85-51);
 
-//   int sayWallEChance = random(1 , 100);
-//   if(sayWallEChance <= 20) 
-//     mp3module.playFolder(2, 1);
+    delay(250);
+    LeftEye.detach();
+    RightEye.detach();
+    delay(250);
 
-//   else {
-//     int randomVoiceLine = random(2, 19);
-//     mp3module.playFolder(2, randomVoiceLine);
-//   }
+    LeftEye.attach(LeftEyePin);
+    RightEye.attach(RightEyePin);
+    Serial.println("Eyes Moved Down");
+    LeftEye.write(90+11.5);
+    RightEye.write(85-11.5);
 
-//   delay(1500);
-//   moveEyes();
-// }
+    delay(250);
+    LeftEye.detach();
+    RightEye.detach();
+    delay(250);
 
-// void moveEyes() {
-//   LeftEyeServo.write(90+20);
-//   RightEyeServo.write(90+20);
-//   delay(200);
-//   LeftEyeServo.write(90);
-//   RightEyeServo.write(90);
-//   delay(200);
-//   LeftEyeServo.write(90+20);
-//   RightEyeServo.write(90+20);
-//   delay(200);
-//   LeftEyeServo.write(90);
-//   RightEyeServo.write(90);
-// }
+    LeftEye.attach(LeftEyePin);
+    RightEye.attach(RightEyePin);
+    Serial.println("Eyes Moved Up");
+    LeftEye.write(90+51);
+    RightEye.write(85-51);
+
+    delay(250);
+    LeftEye.detach();
+    RightEye.detach();
+    delay(250);
+
+    LeftEye.attach(LeftEyePin);
+    RightEye.attach(RightEyePin);
+    Serial.println("Eyes Moved Down");
+    LeftEye.write(90+11.5);
+    RightEye.write(85-11.5);
+
+    delay(250);
+    LeftEye.detach();
+    RightEye.detach();
+}
+
+void wave() { 
+  ArmServo.attach(ArmServoPin);
+  ArmServo.write(90+70);
+  Serial.println("Arm Moved Up");
+ 
+  delay(500);
+  ArmServo.detach();
+  delay(1000);
+
+  WristServo.attach(WristServoPin);
+  WristServo.write(90-45);
+  Serial.println("Wrist Turn Down");
+  
+  delay(500);
+  WristServo.detach();
+  delay(250);
+
+  WristServo.attach(WristServoPin);
+  WristServo.write(150);
+  Serial.println("Wrist Turn Up");
+
+  delay(500);
+  WristServo.detach();
+  delay(250);
+
+  WristServo.attach(WristServoPin);
+  WristServo.write(90-45);
+  Serial.println("Wrist Turn Down");
+  
+  delay(500);
+  WristServo.detach();
+  delay(250);
+
+  WristServo.attach(WristServoPin);
+  WristServo.write(150);
+  Serial.println("Wrist Turn Up");
+
+  delay(500);
+  WristServo.detach();
+  delay(1500); 
+
+  ArmServo.attach(ArmServoPin);
+  ArmServo.write(90);
+  Serial.println("Arm Moved Down");        
+  delay(500);
+  ArmServo.detach();
+}
+
+void playRandomVoiceLine() {
+  mp3module.wakeUp();
+  
+  int sayWallEChance = random(1 , 100);
+  if(sayWallEChance <= 20) 
+    mp3module.playFolder(2, 1);
+
+  else {
+    int randomVoiceLine = random(2, 19);
+    mp3module.playFolder(2, randomVoiceLine);
+  }
+    
+  delay(2000);
+  mp3module.sleep();          
+}

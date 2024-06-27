@@ -7,9 +7,11 @@
 - ~~Volume Potentiometer~~
 - Configure PIR Sensor
 - ~~Wave Detector~~
-- Eye Servo Movement
-- Arm Servo Movement
-- Give Wall-E a voice
+- ~~Eye Servo Movement~~
+- ~~Arm Servo Movement~~
+- Fix Wall-E voice volume
+- Smooth out arm movement
+
 <br></br>
 
 ## BUGS
@@ -17,8 +19,9 @@
   - Switched to `mp3module.readState()` to determine if song is playing
 - ~~Potentiometer might slowly decrease over time~~
   - I'm gonna ignore that probably won't happen
-- OLed screen takes a while to load
-- Button Debounce 
+- ~~OLed screen takes a while to load~~
+  - I was on crack when I wrote that it works fine
+- ~~Button Debounce~~
 
 <br></br>
 

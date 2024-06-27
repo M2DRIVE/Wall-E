@@ -43,7 +43,7 @@ void setup(){
   numOfSongs = mp3module.numTracksInFolder(1);
   Serial.println(numOfSongs);
   mp3module.sleep();
-  delay(100);
+  delay(1000);
 }
 
 void loop(){
