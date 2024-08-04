@@ -183,6 +183,8 @@ void setup() {
   numOfSongs = mp3module.numTracksInFolder(1);
   mp3module.sleep();
   delay(1000);
+
+  randomSeed(analogRead(A0));
 }
 
 void loop() {
@@ -299,48 +301,48 @@ void loop() {
 }
 
 void moveEyes() { 
-    Serial.println("Eyes Moved Up");
-    LeftEye.attach(LeftEyePin);
-    RightEye.attach(RightEyePin);
-    LeftEye.write(90+51);
-    RightEye.write(85-51);
+  Serial.println("Eyes Moved Up");
+  LeftEye.attach(LeftEyePin);
+  RightEye.attach(RightEyePin);
+  LeftEye.write(90+51);
+  RightEye.write(85-51);
 
-    delay(250);
-    LeftEye.detach();
-    RightEye.detach();
-    delay(250);
+  delay(250);
+  LeftEye.detach();
+  RightEye.detach();
+  delay(250);
 
-    LeftEye.attach(LeftEyePin);
-    RightEye.attach(RightEyePin);
-    Serial.println("Eyes Moved Down");
-    LeftEye.write(90+11.5);
-    RightEye.write(85-11.5);
+  LeftEye.attach(LeftEyePin);
+  RightEye.attach(RightEyePin);
+  Serial.println("Eyes Moved Down");
+  LeftEye.write(90+11.5);
+  RightEye.write(85-11.5);
 
-    delay(250);
-    LeftEye.detach();
-    RightEye.detach();
-    delay(250);
+  delay(250);
+  LeftEye.detach();
+  RightEye.detach();
+  delay(250);
 
-    LeftEye.attach(LeftEyePin);
-    RightEye.attach(RightEyePin);
-    Serial.println("Eyes Moved Up");
-    LeftEye.write(90+51);
-    RightEye.write(85-51);
+  LeftEye.attach(LeftEyePin);
+  RightEye.attach(RightEyePin);
+  Serial.println("Eyes Moved Up");
+  LeftEye.write(90+51);
+  RightEye.write(85-51);
 
-    delay(250);
-    LeftEye.detach();
-    RightEye.detach();
-    delay(250);
+  delay(250);
+  LeftEye.detach();
+  RightEye.detach();
+  delay(250);
 
-    LeftEye.attach(LeftEyePin);
-    RightEye.attach(RightEyePin);
-    Serial.println("Eyes Moved Down");
-    LeftEye.write(90+11.5);
-    RightEye.write(85-11.5);
+  LeftEye.attach(LeftEyePin);
+  RightEye.attach(RightEyePin);
+  Serial.println("Eyes Moved Down");
+  LeftEye.write(90+11.5);
+  RightEye.write(85-11.5);
 
-    delay(250);
-    LeftEye.detach();
-    RightEye.detach();
+  delay(250);
+  LeftEye.detach();
+  RightEye.detach();
 }
 
 void wave() { 
@@ -403,6 +405,6 @@ void playRandomVoiceLine() {
     mp3module.playFolder(2, randomVoiceLine);
   }
     
-  delay(2000);
+  delay(3000);
   mp3module.sleep();          
 }
