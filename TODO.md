@@ -9,8 +9,9 @@
 - ~~Wave Detector~~
 - ~~Eye Servo Movement~~
 - ~~Arm Servo Movement~~
-- Fix Wall-E voice volume
+- ~~Fix Wall-E voice volume~~
 - Smooth out arm movement
+- Shuffle Play on Tracks 005+
 
 <br></br>
 

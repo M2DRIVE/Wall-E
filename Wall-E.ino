@@ -47,7 +47,7 @@ const byte medianFilterWindowSize = 5;
 SharpDistSensor sensor(sensorPin, medianFilterWindowSize);
 
 int sampleCounter = 0;
-const int threshold = 400;
+const int threshold = 800;
 
 enum State {
   INIT,
@@ -184,7 +184,7 @@ void setup() {
   mp3module.sleep();
   delay(1000);
 
-  randomSeed(analogRead(A0));
+  randomSeed(analogRead(A2));
 }
 
 void loop() {

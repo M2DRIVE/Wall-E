@@ -54,9 +54,9 @@ void loop() {
     case SECOND_PEAK:
       if (distance < threshold) {
         // Pattern detected
-        digitalWrite(2, HIGH);
+        digitalWrite(13, HIGH);
         delay(500);
-        digitalWrite(2, LOW);
+        digitalWrite(13, LOW);
         currentState = INIT;
       }
       break;
