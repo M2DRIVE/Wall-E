@@ -49,6 +49,7 @@ SharpDistSensor sensor(sensorPin, medianFilterWindowSize);
 int sampleCounter = 0;
 const int threshold = 800;
 
+
 enum State {
   INIT,
   FIRST_DROP,

@@ -1,7 +1,7 @@
 {
     "board": "arduino:avr:nano",
     "programmer": "avrispmkii",
-    "sketch": "Wall-E.ino",
+    "sketch": "dfplayer\\dfplayer\\dfplayer.ino",
     "port": "COM8",
     "configuration": "cpu=atmega328old"
 }

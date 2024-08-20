@@ -5,13 +5,14 @@
 - ~~Pause Music Tracks~~
 - ~~Resume Music Tracks~~
 - ~~Volume Potentiometer~~
-- Configure PIR Sensor
+- ~~Configure PIR Sensor~~
 - ~~Wave Detector~~
 - ~~Eye Servo Movement~~
 - ~~Arm Servo Movement~~
 - ~~Fix Wall-E voice volume~~
 - Smooth out arm movement
-- Shuffle Play on Tracks 005+
+- ~~Shuffle Play on Tracks 005+~~
+- Reduce power consumption from OLed
 
 <br></br>
 
@@ -20,6 +21,7 @@
   - Switched to `mp3module.readState()` to determine if song is playing
 - ~~Potentiometer might slowly decrease over time~~
   - I'm gonna ignore that probably won't happen
+    - The potentiometer was busted nvm I replaced it
 - ~~OLed screen takes a while to load~~
   - I was on crack when I wrote that it works fine
 - ~~Button Debounce~~

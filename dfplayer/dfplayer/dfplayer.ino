@@ -14,6 +14,8 @@ int skipRead = 0;
 int stopRead = 0;
 int currentTrack = 1;
 int numOfSongs;
+int* shufflePlay; 
+bool stopPressed = true;
 
 void setup(){
   Serial.begin(9600);
@@ -43,12 +45,40 @@ void setup(){
   numOfSongs = mp3module.readFileCountsInFolder(1);
   Serial.println(numOfSongs);
   delay(100);
+
+  randomSeed(analogRead(A2));
+
+  shufflePlay = new int[numOfSongs];
+  for(int i = 0; i < numOfSongs; i++) 
+    shufflePlay[i] = i+1;
+
+  //  for (int i = 0; i < numOfSongs; i++) {
+  //   Serial.print("shufflePlay[");
+  //   Serial.print(i);
+  //   Serial.print("] = ");
+  //   Serial.println(shufflePlay[i]);
+  // }
+
+  for (int i = 5; i < numOfSongs; i++) {
+    int r = i + random(numOfSongs - i); 
+    int temp = shufflePlay[i];
+    shufflePlay[i] = shufflePlay[r];
+    shufflePlay[r] = temp;
+  }
+
+  //  for (int i = 0; i < numOfSongs; i++) {
+  //   Serial.print("shufflePlay[");
+  //   Serial.print(i);
+  //   Serial.print("] = ");
+  //   Serial.println(shufflePlay[i]);
+  // }
 }
 
 void loop(){
-  int volume = map(analogRead(potentiometer), 5, 1010, 0, 30);
-  volume = constrain(volume, 0, 30);
-  mp3module.volume(volume);
+  // int volume = map(analogRead(potentiometer), 5, 1010, 0, 30);
+  // volume = constrain(volume, 0, 30);
+  // mp3module.volume(volume);
+  mp3module.volume(0);
 
   playRead = digitalRead(playPin);
   skipRead = digitalRead(skipPin);
@@ -61,13 +91,14 @@ void loop(){
   if (stopRead == LOW) {
     Serial.println("Stopping track " + String(currentTrack));
     mp3module.stop();
+    stopPressed = true;
     delay(500);
   }
 
   else if (playRead == LOW) {
     if (mp3module.readState() == notPlaying) {
       Serial.println("Playing track " + String(currentTrack));
-      mp3module.playFolder(1, currentTrack);
+      mp3module.playFolder(1, shufflePlay[currentTrack-1]);
     } 
     // Pause Conditions
     else {
@@ -84,17 +115,25 @@ void loop(){
       }
     }
 
+    mp3module.readState();
+    stopPressed = false;
     delay(500);
   }
 
+  // Skip conditions
   else if (skipRead == LOW) {
     currentTrack = (currentTrack++ % numOfSongs) + 1;
     if (mp3module.readState() == playing || mp3module.readState() == paused) {
-      mp3module.playFolder(1, currentTrack);
+      mp3module.playFolder(1, shufflePlay[currentTrack-1]);
     }
     Serial.println("Skipping to track " + String(currentTrack));
     delay(500);
   }
 
-  Serial.println("Current Track : " +String(currentTrack) + "  |  State : " + String(mp3module.readState()) + "  |  State : " + String(analogRead(potentiometer)));
+  if(mp3module.readState() == notPlaying && !stopPressed) {
+    currentTrack = (currentTrack++ % numOfSongs) + 1;
+    mp3module.playFolder(1, shufflePlay[currentTrack-1]);
+    Serial.println("Skipping to track " + String(currentTrack));
+  }
+  Serial.println("Current Track : " +String(currentTrack) + "  |  State : " + String(mp3module.readState()) + "  |  Stop Pressed : " + String(stopPressed));
 }
