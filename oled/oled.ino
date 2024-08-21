@@ -72,6 +72,25 @@ const unsigned int bitmapSize = bitmapWidth * bitmapHeight / 8; // Calculate bit
 void setup() {
     // Initialize OLED display with SPI
     display.begin();
+
+	// Set contrast to the lowest values to minimize power consumption
+	display.writeCommand(SSD1331_CMD_CONTRASTA); 
+	display.writeCommand(0x00);  // Lowest contrast for color A
+	
+	display.writeCommand(SSD1331_CMD_CONTRASTB); 
+	display.writeCommand(0x00);  // Lowest contrast for color B
+	
+	display.writeCommand(SSD1331_CMD_CONTRASTC); 
+	display.writeCommand(0x00);  // Lowest contrast for color C
+	
+	// Set clock frequency to the lowest possible value
+	display.writeCommand(SSD1331_CMD_CLOCKDIV); 
+	display.writeCommand(0xFF);  // Maximum divide ratio, lowest frequency
+
+	// Set power mode to reduce power consumption
+	display.writeCommand(SSD1331_CMD_POWERMODE);
+	display.writeCommand(0x00); // Power save mode
+
     display.setRotation(0); // Adjust rotation if needed
     display.fillRect(0, 0, display.width(), display.height(), 0); // Fill with black
 
