@@ -1,7 +1,7 @@
 {
     "board": "arduino:avr:nano",
     "programmer": "avrispmkii",
-    "sketch": "oled\\oled.ino",
-    "port": "COM8",
+    "sketch": "servos\\arm_servos\\arm_servos.ino",
+    "port": "COM6",
     "configuration": "cpu=atmega328old"
 }

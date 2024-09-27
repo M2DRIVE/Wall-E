@@ -6,17 +6,23 @@ Servo ArmServo;
 const int WristServoPin = 11;
 const int ArmServoPin = 10;
 
+const int upAngle = 135;
+const int downAngle = 20;
+
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   ArmServo.attach(ArmServoPin);
+  
   WristServo.attach(WristServoPin);
+    WristServo.write(upAngle);
+
   Serial.println("--------------------");
   Serial.println("Servos Attached");
-  
-  delay(500);
+  Serial.print("Reading ");
+  Serial.println(WristServo.read());
+  delay(1500);
 
   ArmServo.write(90);
-  WristServo.write(150);
   Serial.println("Servos Calibrated");
 
   delay(2000);
@@ -30,22 +36,22 @@ void setup() {
 
   delay(1500);
 
-  WristServo.write(90-45);
+  WristServo.write(downAngle);
   Serial.println("Wrist Turn Down");
 
   delay(750);
 
-  WristServo.write(150);
+  WristServo.write(upAngle);
   Serial.println("Wrist Turn Up");
 
   delay(750);
 
-  WristServo.write(90-45);
+  WristServo.write(downAngle);
   Serial.println("Wrist Turn Down");
   
   delay(750);
 
-  WristServo.write(150);
+  WristServo.write(upAngle);
   Serial.println("Wrist Turn Up");
 
   delay(2000); 

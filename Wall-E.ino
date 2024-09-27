@@ -38,6 +38,8 @@ int skipRead = 0;
 int stopRead = 0;
 int currentTrack = 1;
 int numOfSongs;
+int* shufflePlay; 
+bool stopPressed = true;
 
 SoftwareSerial mySoftwareSerial(12, 13);
 DFPlayerMini_Fast mp3module;
@@ -121,6 +123,25 @@ const unsigned int bitmapSize = bitmapWidth * bitmapHeight / 8;
 void setup() {
   // Initialize OLED display with SPI
   display.begin();
+
+	display.writeCommand(SSD1331_CMD_CONTRASTA); 
+	display.writeCommand(0x00);  
+	
+	display.writeCommand(SSD1331_CMD_CONTRASTB); 
+	display.writeCommand(0x00);  
+	
+	display.writeCommand(SSD1331_CMD_CONTRASTC); 
+	display.writeCommand(0x00);  
+	
+	display.writeCommand(SSD1331_CMD_CLOCKDIV); 
+	display.writeCommand(0xFF);
+
+	display.writeCommand(SSD1331_CMD_POWERMODE);
+	display.writeCommand(0x00);
+
+  display.setRotation(0);
+  display.fillRect(0, 0, display.width(), display.height(), 0); // Fill with black
+
   display.setRotation(0); 
   display.fillRect(0, 0, display.width(), display.height(), 0); // Fill with black
 
@@ -186,6 +207,17 @@ void setup() {
   delay(1000);
 
   randomSeed(analogRead(A2));
+
+  shufflePlay = new int[numOfSongs];
+  for(int i = 0; i < numOfSongs; i++) 
+    shufflePlay[i] = i+1;
+
+  for (int i = 5; i < numOfSongs; i++) {
+    int r = i + random(numOfSongs - i); 
+    int temp = shufflePlay[i];
+    shufflePlay[i] = shufflePlay[r];
+    shufflePlay[r] = temp;
+  }
 }
 
 void loop() {
@@ -205,6 +237,7 @@ void loop() {
     delay(100);
     mp3module.sleep();
     delay(500);
+    stopPressed = true;
   }
 
   else if (playRead == LOW) {
@@ -229,9 +262,12 @@ void loop() {
       }
     }
 
+    mp3module.readState();
+    stopPressed = false;
     delay(500);
   }
 
+  // Skip Conditions
   else if (skipRead == LOW) {
     currentTrack = (currentTrack++ % numOfSongs) + 1;
     if (mp3module.isPlaying()) {
@@ -239,6 +275,12 @@ void loop() {
     }
     Serial.println("Skipping to track " + String(currentTrack));
     delay(500);
+  }
+
+  if(mp3module.readState() == notPlaying && !stopPressed) {
+    currentTrack = (currentTrack++ % numOfSongs) + 1;
+    mp3module.playFolder(1, shufflePlay[currentTrack-1]);
+    Serial.println("Skipping to track " + String(currentTrack));
   }
 
   Serial.println("Current Track : " +String(currentTrack) + "  |  State : " + String(mp3module.isPlaying()));
