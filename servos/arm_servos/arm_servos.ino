@@ -6,15 +6,15 @@ Servo ArmServo;
 const int WristServoPin = 11;
 const int ArmServoPin = 10;
 
-const int upAngle = 135;
-const int downAngle = 20;
+const int upAngle = 90;
+const int downAngle = 0;
 
 void setup() {
   Serial.begin(115200);
   ArmServo.attach(ArmServoPin);
   
   WristServo.attach(WristServoPin);
-    WristServo.write(upAngle);
+  WristServo.write(upAngle);
 
   Serial.println("--------------------");
   Serial.println("Servos Attached");

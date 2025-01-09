@@ -78,7 +78,7 @@ void loop(){
   // int volume = map(analogRead(potentiometer), 5, 1010, 0, 30);
   // volume = constrain(volume, 0, 30);
   // mp3module.volume(volume);
-  mp3module.volume(0);
+  mp3module.volume(15);
 
   playRead = digitalRead(playPin);
   skipRead = digitalRead(skipPin);

@@ -1,7 +1,7 @@
 {
     "board": "arduino:avr:nano",
     "programmer": "avrispmkii",
-    "sketch": "servos\\arm_servos\\arm_servos.ino",
-    "port": "COM6",
+    "sketch": "Wall-E.ino",
+    "port": "COM5",
     "configuration": "cpu=atmega328old"
 }

@@ -32,6 +32,9 @@ Servo LeftEye;
 Servo ArmServo;
 Servo WristServo;
 
+const int upAngle = 90;
+const int downAngle = 0; 
+
 // DFPlayer Mini
 int playRead = 0;
 int skipRead = 0;
@@ -40,6 +43,7 @@ int currentTrack = 1;
 int numOfSongs;
 int* shufflePlay; 
 bool stopPressed = true;
+bool isPaused = false;
 
 SoftwareSerial mySoftwareSerial(12, 13);
 DFPlayerMini_Fast mp3module;
@@ -162,7 +166,7 @@ void setup() {
   WristServo.attach(WristServoPin);
   delay(100);
   ArmServo.write(90);
-  WristServo.write(150);
+  WristServo.write(upAngle);
   delay(500);
   ArmServo.detach();
   WristServo.detach();
@@ -209,8 +213,9 @@ void setup() {
   randomSeed(analogRead(A2));
 
   shufflePlay = new int[numOfSongs];
-  for(int i = 0; i < numOfSongs; i++) 
+  for(int i = 0; i < numOfSongs; i++) {
     shufflePlay[i] = i+1;
+  }
 
   for (int i = 5; i < numOfSongs; i++) {
     int r = i + random(numOfSongs - i); 
@@ -238,31 +243,31 @@ void loop() {
     mp3module.sleep();
     delay(500);
     stopPressed = true;
+    isPaused = false;
   }
 
   else if (playRead == LOW) {
-    if (!mp3module.isPlaying()) {
+    if (!mp3module.isPlaying() && !isPaused) {
       Serial.println("Playing track " + String(currentTrack));
       mp3module.wakeUp();
-      mp3module.playFolder(1, currentTrack);
+      mp3module.playFolder(1, shufflePlay[currentTrack-1]);
     } 
     
     // Pause Conditions
     else {
-      if (mp3module.isPlaying())
-      {
+      if (mp3module.isPlaying()) {
         mp3module.pause();
+        isPaused = true;
         Serial.println("Pausing track " + String(currentTrack));
       }
 
-      else 
-      {
+      else {
         mp3module.resume();
+        isPaused = false;
         Serial.println("Resuming track " + String(currentTrack));
       }
     }
 
-    mp3module.readState();
     stopPressed = false;
     delay(500);
   }
@@ -270,14 +275,14 @@ void loop() {
   // Skip Conditions
   else if (skipRead == LOW) {
     currentTrack = (currentTrack++ % numOfSongs) + 1;
-    if (mp3module.isPlaying()) {
-      mp3module.playFolder(1, currentTrack);
+    if (mp3module.isPlaying() || isPaused) {
+      mp3module.playFolder(1, shufflePlay[currentTrack-1]);
     }
     Serial.println("Skipping to track " + String(currentTrack));
     delay(500);
   }
 
-  if(mp3module.readState() == notPlaying && !stopPressed) {
+  if(!mp3module.isPlaying() && !stopPressed && !isPaused) {
     currentTrack = (currentTrack++ % numOfSongs) + 1;
     mp3module.playFolder(1, shufflePlay[currentTrack-1]);
     Serial.println("Skipping to track " + String(currentTrack));
@@ -398,7 +403,7 @@ void wave() {
   delay(1000);
 
   WristServo.attach(WristServoPin);
-  WristServo.write(90-45);
+  WristServo.write(downAngle);
   Serial.println("Wrist Turn Down");
   
   delay(500);
@@ -406,7 +411,7 @@ void wave() {
   delay(250);
 
   WristServo.attach(WristServoPin);
-  WristServo.write(150);
+  WristServo.write(upAngle);
   Serial.println("Wrist Turn Up");
 
   delay(500);
@@ -414,7 +419,7 @@ void wave() {
   delay(250);
 
   WristServo.attach(WristServoPin);
-  WristServo.write(90-45);
+  WristServo.write(downAngle);
   Serial.println("Wrist Turn Down");
   
   delay(500);
@@ -422,7 +427,7 @@ void wave() {
   delay(250);
 
   WristServo.attach(WristServoPin);
-  WristServo.write(150);
+  WristServo.write(upAngle);
   Serial.println("Wrist Turn Up");
 
   delay(500);

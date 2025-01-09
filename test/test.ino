@@ -37,11 +37,11 @@
 
 
 // You can use any (4 or) 5 pins
-#define sclk 13
-#define mosi 11
-#define cs   2
-#define rst  3
-#define dc   4
+#define sclk A4
+#define mosi A5
+#define cs   5
+#define rst  8
+#define dc   7
 
 
 // Color definitions
